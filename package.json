@@ -1,0 +1,28 @@
+{
+  "name": "hyperion",
+  "version": "1.0.0",
+  "description": "Proyecto página",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Erick2356/Hyperion.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Erick2356/Hyperion/issues"
+  },
+  "homepage": "https://github.com/Erick2356/Hyperion#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
