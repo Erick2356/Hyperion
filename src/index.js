@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 require("dotenv").config();
 const userRoutes = require("./routes/user");
 const newsRoutes = require("./routes/news");
+const JournalistRoutes = require("./models/journalist"); //ruta del modelo Journalist
 
 
 
@@ -14,6 +15,7 @@ const port = process.env.PORT || 9000;
 app.use(express.json());
 app.use('/api', userRoutes);
 app.use('/api', newsRoutes);
+app.use('/api/journalists', JournalistRoutes);
 //routes
 app.get('/', (req, res) => {
 
