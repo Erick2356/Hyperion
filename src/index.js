@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 require("dotenv").config();
 const userRoutes = require("./routes/user");
 const newsRoutes = require("./routes/news");
-const JournalistRoutes = require("./models/journalist"); //ruta del modelo Journalist
+const JournalistRoutes = require("./routes/journalist"); //ruta de la ruta Journalist
 
 
 
