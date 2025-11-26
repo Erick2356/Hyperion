@@ -1,43 +1,61 @@
-const express = require("express");
+require('dotenv').config();
+const express = require('express');
 const mongoose = require('mongoose');
-const cors = require("cors"); // ← Importar CORS
-require("dotenv").config();
-const userRoutes = require("./routes/user");
-const newsRoutes = require("./routes/news");
-const JournalistRoutes = require("./routes/journalist");
+const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 9000;
 
-// Middleware CORS completo
-app.use(cors({
-    origin: ['http://localhost:4200', 'http://localhost:3000'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
-
-// Middleware
+// Middlewares
+app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/api', userRoutes);
-app.use('/api', newsRoutes);
-app.use('/api/journalists', JournalistRoutes);
+// Conexión a MongoDB
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hyperion', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => console.log('✅ Conectado a MongoDB'))
+    .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
-// Ruta de prueba
-app.get('/', (req, res) => {
-    res.json({ message: "API Hyperion funcionando" });
-});
+// Importar rutas
+const userRoutes = require('./routes/user');
+const newsRoutes = require('./routes/news');
+const journalistRoutes = require('./routes/journalist');
 
-// Ruta de prueba específica para usuarios
+// Usar rutas
+app.use('/api/users', userRoutes);
+app.use('/api/news', newsRoutes);
+app.use('/api/journalists', journalistRoutes);
+
+// Ruta de prueba básica
 app.get('/api/test', (req, res) => {
-    res.json({ message: "Ruta de prueba funcionando" });
+    res.json({
+        success: true,
+        message: '✅ API HyperNews funcionando correctamente',
+        timestamp: new Date().toISOString()
+    });
 });
 
-// MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log("✅ Connected to MongoDB Atlas"))
-    .catch((error) => console.error("❌ MongoDB error:", error));
+// Manejar rutas no encontradas
+app.use('*', (req, res) => {
+    res.status(404).json({
+        success: false,
+        message: `Ruta no encontrada: ${req.originalUrl}`
+    });
+});
 
-app.listen(port, () => console.log("🚀 Server listening on port", port));
+// Manejo de errores
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? err.message : {}
+    });
+});
+
+const PORT = process.env.PORT || 9000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+    console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+});
