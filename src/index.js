@@ -21,17 +21,27 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hyperion'
 const userRoutes = require('./routes/user');
 const newsRoutes = require('./routes/news');
 const journalistRoutes = require('./routes/journalist');
+const commentRoutes = require('./routes/comment');
 
 // Usar rutas
 app.use('/api/users', userRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/journalists', journalistRoutes);
+app.use('/api/comments', commentRoutes);
 
 // Ruta de prueba básica
 app.get('/api/test', (req, res) => {
     res.json({
         success: true,
         message: '✅ API HyperNews funcionando correctamente',
+        timestamp: new Date().toISOString()
+    });
+});
+//Solo para los comentarios 
+app.get('/api/comments/test', (req, res) => {
+    res.json({
+        success: true,
+        message: '✅ Ruta de comentarios funcionando',
         timestamp: new Date().toISOString()
     });
 });

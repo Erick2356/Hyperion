@@ -35,8 +35,12 @@ const registerUser = async (req, res) => {
 
         // Generar token JWT
         const token = jwt.sign(
-            { id: newUser._id, role: newUser.role },
-            process.env.JWT_SECRET || 'fallback_secret',
+            {
+                id: newUser._id,
+                role: newUser.role,
+                email: newUser.email
+            },
+            process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
 
@@ -96,8 +100,12 @@ const loginUser = async (req, res) => {
 
         // Generar token JWT
         const token = jwt.sign(
-            { id: user._id, role: user.role },
-            process.env.JWT_SECRET || 'fallback_secret',
+            {
+                id: user._id,
+                role: user.role,
+                email: user.email
+            },
+            process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
 

@@ -5,7 +5,7 @@ const User = require('../models/user');
 const authenticateToken = async (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1]; // Formato: Bearer TOKEN
+        const token = authHeader && authHeader.split(' ')[1];
 
         if (!token) {
             return res.status(401).json({
@@ -14,8 +14,8 @@ const authenticateToken = async (req, res, next) => {
             });
         }
 
-        // Verificar token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+        // Verificar token con el mismo secret
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Buscar usuario en la base de datos
         const user = await User.findById(decoded.id).select('-password');
@@ -27,12 +27,34 @@ const authenticateToken = async (req, res, next) => {
         }
 
         // Agregar usuario al request
-        req.user = user;
+        req.user = {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        };
+
         next();
     } catch (error) {
+        console.error('Error verifying token:', error.message);
+
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(403).json({
+                success: false,
+                message: 'Token inválido'
+            });
+        }
+
+        if (error.name === 'TokenExpiredError') {
+            return res.status(403).json({
+                success: false,
+                message: 'Token expirado'
+            });
+        }
+
         return res.status(403).json({
             success: false,
-            message: 'Token inválido o expirado'
+            message: 'Error al verificar token'
         });
     }
 };
