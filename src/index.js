@@ -22,12 +22,14 @@ const userRoutes = require('./routes/user');
 const newsRoutes = require('./routes/news');
 const journalistRoutes = require('./routes/journalist');
 const commentRoutes = require('./routes/comment');
+const dashboardRoutes = require('./routes/dashboard');
 
 // Usar rutas
 app.use('/api/users', userRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/journalists', journalistRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Ruta de prueba básica
 app.get('/api/test', (req, res) => {
