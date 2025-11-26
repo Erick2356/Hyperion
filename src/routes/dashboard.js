@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken, authorize } = require('../middleware/authMiddleware');
-
-// Ruta temporal del dashboard - la implementaremos después
+ 
 router.get('/test', authenticateToken, (req, res) => {
     res.json({
         success: true,
