@@ -1,48 +1,31 @@
-const express = require("express");
-const newsSchema = require("../models/news")
-
+const express = require('express');
 const router = express.Router();
+const {
+    getAllNews,
+    getNewsById,
+    createNews,
+    updateNews,
+    deleteNews,
+    reviewNews,
+    getMyNews,
+    getNewsForModeration
+} = require('../controllers/newsController');
+const { authenticateToken, authorize } = require('../middleware/authMiddleware');
 
-//create news
-router.post('/news', (req, res) => {
-    const news = newsSchema(req.body);
+// Rutas públicas
+router.get('/', getAllNews);
+router.get('/:id', getNewsById);
 
-    news.save().then((data) => res.json(data)).catch((error) => res.json({ message: error }));
+// Rutas protegidas para usuarios registrados
+router.get('/my/news', authenticateToken, getMyNews);
 
-})
+// Rutas para periodistas
+router.post('/', authenticateToken, authorize(['journalist', 'moderator', 'admin']), createNews);
+router.put('/:id', authenticateToken, updateNews); // El controlador verifica permisos
+router.delete('/:id', authenticateToken, deleteNews); // El controlador verifica permisos
 
-//get news
-router.get('/news', (req, res) => {
-
-    newsSchema.find().then((data) => res.json(data)).catch((error) => res.json({ message: error }));
-
-})
-
-//get a news
-router.get('/news/:id', (req, res) => {
-    const { id } = req.params;
-
-    newsSchema.findById(id).then((data) => res.json(data)).catch((error) => res.json({ message: error }));
-
-})
-
-//uptade news
-
-router.put('/news/:id', (req, res) => {
-    const { id } = req.params;
-
-    newsSchema.updateOne({ _id: id }, { $set: req.body })
-        .then((data) => res.json(data))
-        .catch((error) => res.json({ message: error }));
-});
-
-//delete news
-router.delete('/news/:id', (req, res) => {
-    const { id } = req.params;
-
-
-    newsSchema.deleteOne({ _id: id }).then((data) => res.json(data)).catch((error) => res.json({ message: error }));
-
-})
+// Rutas para moderadores
+router.get('/moderation/queue', authenticateToken, authorize(['moderator', 'admin']), getNewsForModeration);
+router.patch('/:id/review', authenticateToken, authorize(['moderator', 'admin']), reviewNews);
 
 module.exports = router;
