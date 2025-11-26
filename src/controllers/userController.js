@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Registrar nuevo usuario
+// Registrar nuevo usuario
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
@@ -20,9 +21,11 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Crear nuevo usuario (solo permitir roles básicos en registro)
-        const allowedRoles = ['reader', 'registered_user'];
+        // PERMITIR TODOS LOS ROLES EN REGISTRO
+        const allowedRoles = ['reader', 'registered_user', 'journalist', 'moderator', 'admin'];
         const userRole = allowedRoles.includes(role) ? role : 'reader';
+
+        console.log('🔐 Registrando usuario con rol:', userRole); // Para debug
 
         const newUser = new User({
             name,
@@ -35,11 +38,7 @@ const registerUser = async (req, res) => {
 
         // Generar token JWT
         const token = jwt.sign(
-            {
-                id: newUser._id,
-                role: newUser.role,
-                email: newUser.email
-            },
+            { id: newUser._id, role: newUser.role, email: newUser.email },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -52,13 +51,14 @@ const registerUser = async (req, res) => {
                     id: newUser._id,
                     name: newUser.name,
                     email: newUser.email,
-                    role: newUser.role
+                    role: newUser.role // ← Esto debe reflejar el rol correcto
                 },
                 token
             }
         });
 
     } catch (error) {
+        console.error('Error en registro:', error);
         res.status(500).json({
             success: false,
             message: 'Error al registrar usuario',
